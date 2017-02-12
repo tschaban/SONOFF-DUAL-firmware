@@ -8,32 +8,22 @@
 #include "sonoff-relay.h"
 
 SonoffRelay::SonoffRelay() {
+  init(RELAY_FIRST);
+  init(RELAY_SECOND);
+}
 
-  if (Eeprom.getRelayStartState(RELAY_FIRST) == DEFAULT_RELAY_ON) {
-    on(RELAY_FIRST);
-  } else if (Eeprom.getRelayStartState(RELAY_FIRST) == DEFAULT_RELAY_OFF) {
-    off(RELAY_FIRST);
-  } else if (Eeprom.getRelayStartState(RELAY_FIRST) == DEFAULT_RELAY_LAST_KNOWN) {
-    if (Eeprom.getRelayState(RELAY_FIRST) == 1) {
-      on(RELAY_FIRST);
+void SonoffRelay::init(byte id) {
+  if (Eeprom.getRelayStartState(id) == DEFAULT_RELAY_ON) {
+    on(id);
+  } else if (Eeprom.getRelayStartState(id) == DEFAULT_RELAY_OFF) {
+    off(id);
+  } else if (Eeprom.getRelayStartState(id) == DEFAULT_RELAY_LAST_KNOWN) {
+    if (Eeprom.getRelayState(id) == 1) {
+      on(id);
     } else {
-      off(RELAY_FIRST);
+      off(id);
     }
   }
-
-  if (Eeprom.getRelayStartState(RELAY_SECOND) == DEFAULT_RELAY_ON) {
-    on(RELAY_FIRST);
-  } else if (Eeprom.getRelayStartState(RELAY_SECOND) == DEFAULT_RELAY_OFF) {
-    off(RELAY_FIRST);
-  } else if (Eeprom.getRelayStartState(RELAY_SECOND) == DEFAULT_RELAY_LAST_KNOWN) {
-    if (Eeprom.getRelayState(RELAY_SECOND) == 1) {
-      on(RELAY_SECOND);
-    } else {
-      off(RELAY_SECOND);
-    }
-  }
-
-  
 }
 
 /* Set relay to ON */
@@ -82,36 +72,31 @@ void SonoffRelay::toggle(byte relayID) {
   } else if (relayID == RELAY_SECOND) {
     Relay_2 = !Relay_2;
   }
-
   setRelay();
+  publish(relayID);
+
+  Serial << "Relay: " << relayID << " toggled" << endl;
+  Led.blink();
 }
 
 void SonoffRelay::publish(byte relayID) {
   char  mqttString[50];
   if (relayID == RELAY_FIRST || relayID == RELAY_BOTH) {
-    sprintf(mqttString, "%sfirst/state", Configuration.mqtt_topic);
-    if (Relay_1) {
-      Eeprom.saveRelayState(RELAY_FIRST, 1);
-      Mqtt.publish(mqttString, "ON");
-    } else {
-      Eeprom.saveRelayState(RELAY_FIRST, 0);
-      Mqtt.publish(mqttString, "OFF");
-    }
+    publishState(RELAY_FIRST);
   }
 
   if (relayID == RELAY_SECOND || relayID == RELAY_BOTH) {
-    sprintf(mqttString, "%ssecond/state", Configuration.mqtt_topic);
-    if (Relay_2) {
-      Eeprom.saveRelayState(RELAY_SECOND, 1);
-      Mqtt.publish(mqttString, "ON");
-    } else {
-      Eeprom.saveRelayState(RELAY_SECOND, 0);
-      Mqtt.publish(mqttString, "OFF");
-    }
+    publishState(RELAY_SECOND);
   }
-
 }
 
+void SonoffRelay::publishState(byte id) {
+    char  mqttString[50];
+    sprintf(mqttString, "%s%s/state", Configuration.mqtt_topic,id==RELAY_FIRST?Configuration.relay_1_name:Configuration.relay_2_name);
+    Eeprom.saveRelayState(id,id==RELAY_FIRST?Relay_1?1:0:Relay_2?1:0);
+    Mqtt.publish(mqttString, id==RELAY_FIRST?Relay_1?"ON":"OFF":Relay_2?"ON":"OFF");
+    Serial << "Publish: " << mqttString << endl;
+}
 
 void SonoffRelay::setRelay () {
   byte address = 0;

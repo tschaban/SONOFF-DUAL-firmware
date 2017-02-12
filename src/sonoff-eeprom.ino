@@ -33,6 +33,11 @@ SONOFFCONFIG SonoffEEPROM::getConfiguration() {
   read(8, 6).toCharArray(_temp.id, sizeof(_temp.id));
   read(138, 2).toCharArray(_temp.language, sizeof(_temp.language));
   read(14, 13).toCharArray(_temp.host_name, sizeof(_temp.host_name));
+
+  read(144, 16).toCharArray(_temp.relay_1_name, sizeof(_temp.relay_1_name));
+  read(160, 16).toCharArray(_temp.relay_2_name, sizeof(_temp.relay_2_name));
+
+  
   read(240, 32).toCharArray(_temp.wifi_ssid, sizeof(_temp.wifi_ssid));
   read(272, 32).toCharArray(_temp.wifi_password, sizeof(_temp.wifi_password));  
   read(304, 32).toCharArray(_temp.mqtt_host, sizeof(_temp.mqtt_host));   
@@ -116,6 +121,14 @@ void SonoffEEPROM::saveRelayDefaultState(byte id, unsigned int in) {
      write(143, 1, String(in)); 
 }
 
+
+void SonoffEEPROM::saveRelayName(byte id, String in) {
+  if (id==RELAY_FIRST) 
+     write(144, 16, in);
+  else 
+     write(160, 16, in); 
+}
+
 void SonoffEEPROM::saveWiFiSSID(String in) {
   write(240, 32, in);
 }
@@ -176,6 +189,9 @@ void SonoffEEPROM::setDefaults() {
   saveRelayState(RELAY_SECOND,0);
   saveRelayDefaultState(RELAY_FIRST,sonoffDefault.relay_post_crash);
   saveRelayDefaultState(RELAY_SECOND,sonoffDefault.relay_post_crash);
+  saveRelayName(RELAY_FIRST,sonoffDefault.relay_1_name);
+  saveRelayName(RELAY_SECOND,sonoffDefault.relay_2_name);
+  
   saveLanguage(sonoffDefault.language); 
 }
 

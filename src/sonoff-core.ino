@@ -72,15 +72,21 @@ void Sonoff::connectMQTT() {
   while (!Mqtt.connected()) {
     if (Mqtt.connect(mqttString, Configuration.mqtt_user, Configuration.mqtt_password)) {
       Serial << endl << "Connected" << endl;
-      sprintf(mqttString, "%scmd", Configuration.mqtt_topic);
+      sprintf(mqttString, "%s#", Configuration.mqtt_topic);
       Mqtt.subscribe(mqttString);
-      Serial << " - Subsribed to : " << Configuration.mqtt_topic << endl;
+      Serial << " - Subsribed to : " << mqttString << endl;
 
       /* Updating server with relay state or reading the value from the server */
       if (Eeprom.getRelayStartState(RELAY_FIRST) == DEFAULT_RELAY_SERVER) {
-        getRelayServerValue();
+        getRelayServerValue(RELAY_FIRST);
       } else {
         Relay.publish(RELAY_FIRST);
+      }
+
+      if (Eeprom.getRelayStartState(RELAY_SECOND) == DEFAULT_RELAY_SERVER) {
+        getRelayServerValue(RELAY_SECOND);
+      } else {
+        Relay.publish(RELAY_SECOND);
       }
 
       Led.off();
@@ -125,9 +131,9 @@ void Sonoff::publishTemperature(float temperature) {
   }
 }
 
-void Sonoff::getRelayServerValue() {
+void Sonoff::getRelayServerValue(byte id) {
   char  mqttString[50];
-  sprintf(mqttString, "%sget", Configuration.mqtt_topic);
+  sprintf(mqttString, "%s%s/get", Configuration.mqtt_topic,(id==RELAY_FIRST?Configuration.relay_1_name:Configuration.relay_2_name));
   Serial << endl << " Requesting default relay value";
   Mqtt.publish(mqttString, "defaultState");
   Serial << ", completed" << endl;
@@ -142,8 +148,6 @@ void Sonoff::runSwitch() {
   connectWiFi();
   if (Configuration.ds18b20_present) {
     Serial << endl << "Starting DS18B20" << endl;
-
-    
     setDS18B20Interval(Configuration.ds18b20_interval);
   } else {
     Serial << endl << "DS18B20 not present" << endl;
@@ -188,8 +192,7 @@ boolean Sonoff::isConfigured() {
 void Sonoff::postUpgradeCheck() {
   if (String(sonoffDefault.version) != String(Configuration.version)) {
     Serial << endl << "SOFTWARE WAS UPGRADED from version : " << Configuration.version << " to " << sonoffDefault.version << endl;
-    Eeprom.saveVersion(sonoffDefault.version);
-    
+    Eeprom.saveVersion(sonoffDefault.version);    
     Configuration = Eeprom.getConfiguration();
   }
 }
@@ -206,6 +209,8 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
   char  mqttString[50];
   Led.blink();
   Serial << "Got MQTT Topic : " << topic << ", length=" << length;
+  String sTopic = String(topic);
+  
   if (length >= 1) { // command arrived
     if ((char)payload[1] == 'N') { // ON
       Serial << " ON" << endl;

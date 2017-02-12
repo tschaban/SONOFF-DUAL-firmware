@@ -48,9 +48,6 @@ void setup() {
 
   Configuration = Eeprom.getConfiguration();
 
-
-
-
  
   Serial << endl << "Configuration: " << endl;
   Serial << " - Version: " << Configuration.version << endl;
@@ -64,16 +61,18 @@ void setup() {
   Serial << " - MQTT Port: " << Configuration.mqtt_port << endl;
   Serial << " - MQTT User: " << Configuration.mqtt_user << endl;
   Serial << " - MQTT Password: " << Configuration.mqtt_password << endl;
-  Serial << " - MQTT Topic: " << Configuration.mqtt_topic <<  endl;
-  Serial << " - DS18B20 present: " << Configuration.ds18b20_present << endl;
-  Serial << " - Temp correctin: " << Configuration.ds18b20_correction << endl;
-  Serial << " - Temp interval: " << Configuration.ds18b20_interval << endl;
+  Serial << " - MQTT Topic: " << Configuration.mqtt_topic <<  endl;  
+  Serial << " - Relay 1 name: " << Configuration.relay_1_name << endl;
+  Serial << " - Relay 2 name: " << Configuration.relay_1_name << endl;
   Serial << " - Relay 1 state: " << Eeprom.getRelayState(RELAY_FIRST) << endl;
   Serial << " - Relay 2 state: " << Eeprom.getRelayState(RELAY_SECOND) << endl;
   Serial << " - Post crash relay 1 state: " << Eeprom.getRelayStartState(RELAY_FIRST) << endl;
   Serial << " - Post crash relay 2 state: " << Eeprom.getRelayStartState(RELAY_SECOND) << endl;
+  Serial << " - DS18B20 present: " << Configuration.ds18b20_present << endl;
+  Serial << " - Temp correctin: " << Configuration.ds18b20_correction << endl;
+  Serial << " - Temp interval: " << Configuration.ds18b20_interval << endl;
 
- 
+   
   Sonoff.run(); 
   
 }

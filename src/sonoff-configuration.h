@@ -37,7 +37,9 @@ struct DEFAULTS {
   float         temp_correction = 0;
   unsigned int  temp_interval = 600;
   boolean       temp_present = false; 
-  uint8_t       relay_post_crash = 3;     
+  uint8_t       relay_post_crash = 3;
+  char          relay_1_name[16] = "1";
+  char          relay_2_name[16] = "2";     
  };
 
 
@@ -55,7 +57,11 @@ struct SONOFFCONFIG {
   char          mqtt_host[32];
   unsigned int  mqtt_port;
   char          mqtt_user[32];
-  char          mqtt_password[32];  char          mqtt_topic[32];
+  char          mqtt_password[32];  
+  char          mqtt_topic[32];
+  
+  char          relay_1_name[16];
+  char          relay_2_name[16];          
 
 
   float         ds18b20_correction;

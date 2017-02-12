@@ -47,6 +47,7 @@ class SonoffEEPROM
     void saveTemperatureSensorPresent(unsigned int in);
     void saveRelayState(byte id,unsigned int in);
     void saveRelayDefaultState(byte id, unsigned int in);
+    void saveRelayName(byte id, String in);
     void erase();
 };
 #endif

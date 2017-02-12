@@ -20,6 +20,8 @@ class SonoffRelay
     boolean Relay_1 = false; // to remember state of relay 1, false = off, true = on
     boolean Relay_2 = false; // to remember state of relay 2, false = off, true = on
     void setRelay ();
+    void init(byte id);
+    void publishState(byte id);
   
   public:
     SonoffRelay();

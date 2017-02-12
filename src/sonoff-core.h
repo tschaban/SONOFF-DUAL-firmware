@@ -40,7 +40,7 @@ class Sonoff
     void listener();
     void setDS18B20Interval(int interval);
     void publishTemperature(float temperatur);
-    void getRelayServerValue();
+    void getRelayServerValue(byte id);
 
 
 };

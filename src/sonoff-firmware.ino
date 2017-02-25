@@ -53,8 +53,7 @@ void setup() {
   Serial << " - Version: " << Configuration.version << endl;
   Serial << " - Language: " << Configuration.language << endl;
   Serial << " - Switch mode: " << Configuration.mode << endl;
-  Serial << " - Device ID: " << Configuration.id << endl;
-  Serial << " - Host name: " << Configuration.host_name << endl;
+  Serial << " - Host name: " << Configuration.device_name << endl;
   Serial << " - WiFi SSID: " << Configuration.wifi_ssid << endl;
   Serial << " - WiFi Password: " << Configuration.wifi_password << endl;
   Serial << " - MQTT Host: " << Configuration.mqtt_host << endl;
@@ -63,11 +62,11 @@ void setup() {
   Serial << " - MQTT Password: " << Configuration.mqtt_password << endl;
   Serial << " - MQTT Topic: " << Configuration.mqtt_topic <<  endl;  
   Serial << " - Relay 1 name: " << Configuration.relay_1_name << endl;
-  Serial << " - Relay 2 name: " << Configuration.relay_1_name << endl;
+  Serial << " - Relay 2 name: " << Configuration.relay_2_name << endl;
   Serial << " - Relay 1 state: " << Eeprom.getRelayState(RELAY_FIRST) << endl;
   Serial << " - Relay 2 state: " << Eeprom.getRelayState(RELAY_SECOND) << endl;
-  Serial << " - Post crash relay 1 state: " << Eeprom.getRelayStartState(RELAY_FIRST) << endl;
-  Serial << " - Post crash relay 2 state: " << Eeprom.getRelayStartState(RELAY_SECOND) << endl;
+  Serial << " - Post crash relay 1 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST) << endl;
+  Serial << " - Post crash relay 2 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND) << endl;
   Serial << " - DS18B20 present: " << Configuration.ds18b20_present << endl;
   Serial << " - Temp correctin: " << Configuration.ds18b20_correction << endl;
   Serial << " - Temp interval: " << Configuration.ds18b20_interval << endl;

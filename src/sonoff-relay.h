@@ -25,6 +25,7 @@ class SonoffRelay
   
   public:
     SonoffRelay();
+    uint8_t get(byte relayID);
     void on(byte relayID);
     void off(byte relayID);
     void toggle(byte relayID);

@@ -27,13 +27,8 @@ void handleRoot() {
     "<div class=\"section\">";page+=Configuration.language[0]==101?"Device information":"Informacje o urządzeniu";page+="</div>"
     "<div class=\"section-content\">"
     "<table>"
-    "<tr>"
-    "<td class=\"label\">ID</td>"
-    "<td>: ";page+=Configuration.id;page+="</td>"
-    "</tr>"
-    "<tr>"
     "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="</td>"
-    "<td>: ";page+=Configuration.host_name;page+="</td>"
+    "<td>: ";page+=Configuration.device_name;page+="</td>"
     "</tr>"
     "</table>"
     "</div>"
@@ -90,55 +85,86 @@ void handleRoot() {
     }
     page += "</table>"
     "</div>"
-    "<div class=\"section\">";page+=Configuration.language[0]==101?"Advanced":"Zaawansowane ustawienia";page+=":</div>"
+    "<div class=\"section\">";page+=Configuration.language[0]==101?"Relay #1":"Przełącznik #1";page+=":</div>"
     "<div class=\"section-content\">"
     "<table>"
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"Relay #1 name":"Nazwa przełącznika #1";page+="</td>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="</td>"
     "<td>: ";page+=Configuration.relay_1_name;page+="</td>"
-    "</tr>"   
+    "</tr>"        
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"Relay #2 name":"Nazwa przełącznika #2";page+="</td>"
-    "<td>: ";page+=Configuration.relay_2_name;page+="</td>"
-    "</tr>"      
-    "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay #1 to":"Zachowanie przełącznika #1 po utracie zasilania";page+=":</td>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+=":</td>"
     "<td>"; 
 
-    if (Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_ON) {
+    if (Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
-    } else if (Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_OFF) {
+    } else if (Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_OFF) {
         page += Configuration.language[0]==101?"OFF":"Wyłaczony";
-    } else if (Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN) {
+    } else if (Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN) {
         page += Configuration.language[0]==101?"Last known":"Ostatnia zapamiętana wartość";
-    } else if (Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_SERVER) {
-        page += Configuration.language[0]==101?"Server value":"Wartość z serwera";
-    } else {
-        page += Configuration.language[0]==101?"Not configured yet":"Nie skonfigurowane";
-    }
-    
+    } 
+
     page += "</td>"
     "</tr>"
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay #2 to":"Zachowanie przełącznika #2 po utracie zasilania";page+=":</td>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+=":</td>"
     "<td>"; 
 
-    if (Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_ON) {
+    if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
-    } else if (Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_OFF) {
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_OFF) {
         page += Configuration.language[0]==101?"OFF":"Wyłaczony";
-    } else if (Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN) {
-        page += Configuration.language[0]==101?"Last known":"Ostatnia zapamiętana wartość";
-    } else if (Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_SERVER) {
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN) {
+        page += Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_SERVER) {
         page += Configuration.language[0]==101?"Server value":"Wartość z serwera";
-    } else {
-        page += Configuration.language[0]==101?"Not configured yet":"Nie skonfigurowane";
     }
     
     page += "</td>"
     "</tr>"
     "</table>"
+    "</div>"
+    "<div class=\"section\">"; page += Configuration.language[0]==101?"Relay #2":"Przełącznik #2"; page+=":</div>"
+    "<div class=\"section-content\">"
+    "<table>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="</td>"
+    "<td>: ";page+=Configuration.relay_2_name;page+="</td>"
+    "</tr>"        
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+=":</td>"
+    "<td>"; 
+
+    if (Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_ON) {
+        page += Configuration.language[0]==101?"ON":"Właczony";
+    } else if (Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_OFF) {
+        page += Configuration.language[0]==101?"OFF":"Wyłaczony";
+    } else if (Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN) {
+        page += Configuration.language[0]==101?"Last known":"Ostatnia zapamiętana wartość";
+    } 
+
+    page += "</td>"
+    "</tr>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+=":</td>"
+    "<td>"; 
+
+    if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_ON) {
+        page += Configuration.language[0]==101?"ON":"Właczony";
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_OFF) {
+        page += Configuration.language[0]==101?"OFF":"Wyłaczony";
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN) {
+        page += Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";
+    } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_SERVER) {
+        page += Configuration.language[0]==101?"Server value":"Wartość z serwera";
+    }
+    
+    page += "</td>"
+    "</tr>" 
+    "</table>"
     "</div>";
+
+    
 
   generatePage(page,true,0);
 }
@@ -160,7 +186,16 @@ void handleConfiguration() {
     "</select></td>"
     "</tr>"
     "</table>"
-    "</div>"    
+    "</div>"  
+    "<div class=\"section\">";page+=Configuration.language[0]==101?"Device name":"Nazwa urządzenia";page+=":</div>"
+    "<div class=\"section-content\">"
+    "<table>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="<sup class=\"red\">*</sup></td>"
+    "<td>: <input type=\"text\" name=\"device_name\" length=32 value=\"";page+=Configuration.device_name;page+="\" /></td>"
+    "</tr>"
+    "</table>"      
+    "</div>"      
     "<div class=\"section\">";page+=Configuration.language[0]==101?"WiFi configuration":"Konfiguracja WiFi";page+=":</div>"
     "<div class=\"section-content\">"
     "<table>"
@@ -210,49 +245,67 @@ void handleConfiguration() {
   }
 
   page += "\" /></td>"
-          "</tr>"
-          "<tr>"
-          "<td class=\"label\">";page+=Configuration.language[0]==101?"Correction":"Korekta temperatury";page+="</td>"
-          "<td>: <input type=\"text\" name=\"temp_correction\" length=5 value=\"";page+=Configuration.ds18b20_correction;page+="\" /></td>"
-          "</tr>"
-          "<tr>"
-          "<td class=\"label\">";page+=Configuration.language[0]==101?"Interval (in sec)":"Częstotliwości odczytu (w sek)";page+="</td>"
-          "<td>: <input type=\"text\" name=\"temp_interval\" length=8 value=\"";page+=Configuration.ds18b20_interval;page+="\" /></td>"
-          "</tr>"
-          "</table>";
-          
-   page += "</div>"
-    "<div class=\"section\">";page+=Configuration.language[0]==101?"Advanced":"Zaawansowane";page+=":</div>"
+    "</tr>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Correction":"Korekta temperatury";page+="</td>"
+    "<td>: <input type=\"text\" name=\"temp_correction\" length=6 value=\"";page+=Configuration.ds18b20_correction;page+="\" /></td>"
+    "</tr>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Interval (in sec)":"Częstotliwości odczytu (w sek)";page+="</td>"
+    "<td>: <input type=\"text\" name=\"temp_interval\" length=5 value=\"";page+=Configuration.ds18b20_interval;page+="\" /></td>"
+    "</tr>"
+    "</table>"
+    "</div>"
+    "<div class=\"section\">";page+=Configuration.language[0]==101?"Relay #1":"Przełącznik #1";page+=":</div>"
     "<div class=\"section-content\">"
     "<table>"
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"Relay #1 name":"Nazwa przełącznika #1";page+="<sup class=\"red\">*</sup></td>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="<sup class=\"red\">*</sup></td>"
     "<td>: <input type=\"text\" name=\"relay_1_name\" length=16 value=\"";page+=Configuration.relay_1_name;page+="\" /></td>"
     "</tr>"   
-    "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"Relay #2 name":"Nazwa przełącznika #2";page+="<sup class=\"red\">*</sup></td>"
-    "<td>: <input type=\"text\" name=\"relay_2_name\" length=16 value=\"";page+=Configuration.relay_2_name;page+="\" /></td>"
-    "</tr>"      
-    "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay #1 to":"Po utracie zasilania ustawić przełącznik #1 na";page+=":<sup class=\"red\">*</sup></td>"
-    "<td>: <select name=\"relay_1_restore\" length=1>"
-    "<option value=\"1\""; page+=Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
-    "<option value=\"2\""; page+=Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
-    "<option value=\"3\""; page+=Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
-    "<option value=\"4\""; page+=Eeprom.getRelayStartState(RELAY_FIRST)==DEFAULT_RELAY_SERVER ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Server value":"Wartość z serwera";page+="</option>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay to":"Po przywróceniu zasilania przełącznik ustawić na";page+=":<sup class=\"red\">*</sup></td>"
+    "<td>: <select name=\"relay_1_power_restored\" length=1>"
+    "<option value=\"1\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
+    "<option value=\"2\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
+    "<option value=\"3\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
     "</select></td>"
     "</tr>"
-        "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay #2 to":"Po utracie zasilania ustawić przełącznik #2 na";page+=":<sup class=\"red\">*</sup></td>"
-    "<td>: <select name=\"relay_2_restore\" length=1>"
-    "<option value=\"1\""; page+=Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
-    "<option value=\"2\""; page+=Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
-    "<option value=\"3\""; page+=Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
-    "<option value=\"4\""; page+=Eeprom.getRelayStartState(RELAY_SECOND)==DEFAULT_RELAY_SERVER ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Server value":"Wartość z serwera";page+="</option>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT server is restored set relay to":"Po przywróceniu połaczenia do servera MQTT przełącznik ustawić na";page+=":<sup class=\"red\">*</sup></td>"
+    "<td>: <select name=\"relay_1_connection_restored\" length=1>"
+    "<option value=\"1\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
+    "<option value=\"2\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
+    "<option value=\"3\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
+    "<option value=\"4\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_SERVER ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Server value":"Wartość z serwera";page+="</option>"
     "</select></td>"
     "</tr>"
     "</table>"
     "</div>"
+     "<div class=\"section\">";page+=Configuration.language[0]==101?"Relay #2":"Przełącznik #2";page+=":</div>"
+    "<div class=\"section-content\">"
+    "<table>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"Name":"Nazwa";page+="<sup class=\"red\">*</sup></td>"
+    "<td>: <input type=\"text\" name=\"relay_2_name\" length=16 value=\"";page+=Configuration.relay_2_name;page+="\" /></td>"
+    "</tr>"   
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored set relay to":"Po przywróceniu zasilania przełącznik ustawić na";page+=":<sup class=\"red\">*</sup></td>"
+    "<td>: <select name=\"relay_2_power_restored\" length=1>"
+    "<option value=\"1\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
+    "<option value=\"2\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
+    "<option value=\"3\""; page+=Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
+    "</select></td>"
+    "</tr>"
+    "<tr>"
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT server is restored set relay to":"Po przywróceniu połaczenia do servera MQTT przełącznik ustawić na";page+=":<sup class=\"red\">*</sup></td>"
+    "<td>: <select name=\"relay_2_connection_restored\" length=1>"
+    "<option value=\"1\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_ON ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Włączony";page+="</option>"
+    "<option value=\"2\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_OFF ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Wyłączony";page+="</option>"
+    "<option value=\"3\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_LAST_KNOWN ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Last known":"Ostatnią zapamiętaną wartość";page+="</option>"
+    "<option value=\"4\""; page+=Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_SERVER ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Server value":"Wartość z serwera";page+="</option>"
+    "</select></td>"
+    "</tr>"
+    "</table>"
+    "</div>"   
     "<div class=\"section\"></div>"
     "<div class=\"section-content\">";
   page += "<input class=\"submit\" type=\"submit\" value=\"";page+=Configuration.language[0]==101?"Save":"Zapisz";page+="\" />"
@@ -268,54 +321,39 @@ void handleSave() {
 
   Serial << "Server: saving data" << endl;
 
-  String _wifi_ssid = server.arg("wifi_ssid");
-  String _wifi_password = server.arg("wifi_password");
-  String _mqtt_host = server.arg("mqtt_host");
-  String _mqtt_port = server.arg("mqtt_port");
-  String _mqtt_user = server.arg("mqtt_user");
-  String _mqtt_password = server.arg("mqtt_password");
-  String _mqtt_topic = server.arg("mqtt_topic");
-
-  String _temp_correction = server.arg("temp_correction");
-  String _temp_interval = server.arg("temp_interval");
-
-  String _temp_present = server.arg("temp_present");
-  String _relay_1_restore = server.arg("relay_1_restore");
-  String _relay_2_restore = server.arg("relay_2_restore");
-  String _language = server.arg("language");
-
-  String _relay_1_name = server.arg("relay_1_name");
-  String _relay_2_name = server.arg("relay_2_name");
-
-  if (_wifi_ssid.length() > 0) {
-    Eeprom.saveWiFiSSID(_wifi_ssid);
+  if (server.arg("device_name").length() > 0) {
+    Eeprom.saveDeviceName(server.arg("device_name"));
   }
 
-  if (_wifi_password.length() > 0) {
-    Eeprom.saveWiFiPassword(_wifi_password);
+  if (server.arg("wifi_ssid").length() > 0) {
+    Eeprom.saveWiFiSSID(server.arg("wifi_ssid"));
   }
 
-  if (_mqtt_host.length() > 0) {
-    Eeprom.saveMQTTHost(_mqtt_host);
+  if (server.arg("wifi_password").length() > 0) {
+    Eeprom.saveWiFiPassword(server.arg("wifi_password"));
   }
 
-  if (_mqtt_port.length() > 0) {
-    Eeprom.saveMQTTPort(_mqtt_port.toInt());
+  if (server.arg("mqtt_host").length() > 0) {
+    Eeprom.saveMQTTHost(server.arg("mqtt_host"));
   }
 
-  if (_mqtt_user.length() > 0) {
-    Eeprom.saveMQTTUser(_mqtt_user);
+  if (server.arg("mqtt_port").length() > 0) {
+    Eeprom.saveMQTTPort(server.arg("mqtt_port").toInt());
   }
 
-  if (_mqtt_password.length() > 0) {
-    Eeprom.saveMQTTPassword(_mqtt_password);
+  if (server.arg("mqtt_user").length() > 0) {
+    Eeprom.saveMQTTUser(server.arg("mqtt_user"));
   }
 
-  if (_mqtt_topic.length() > 0) {
-    Eeprom.saveMQTTTopic(_mqtt_topic);
+  if (server.arg("mqtt_password").length() > 0) {
+    Eeprom.saveMQTTPassword(server.arg("mqtt_password"));
   }
 
-  if (_temp_present.length() > 0 ) {
+  if (server.arg("mqtt_topic").length() > 0) {
+    Eeprom.saveMQTTTopic(server.arg("mqtt_topic"));
+  }
+
+  if (server.arg("temp_present").length() > 0 ) {
     Eeprom.saveTemperatureSensorPresent(1);
   } else {
     if (Eeprom.isDS18B20Present()) {
@@ -323,32 +361,39 @@ void handleSave() {
     }
   }
 
-  if (_temp_correction.length() > 0 ) {
-    Eeprom.saveTemperatureCorrection(_temp_correction.toFloat());
+  if (server.arg("temp_correction").length() > 0 ) {
+    Eeprom.saveTemperatureCorrection(server.arg("temp_correction").toFloat());
   }
 
-  if (_temp_interval.length() > 0) {
-    Eeprom.saveTemperatureInterval(_temp_interval.toInt());
+  if (server.arg("temp_interval").length() > 0) {
+    Eeprom.saveTemperatureInterval(server.arg("temp_interval").toInt());
   }
 
-  if (_relay_1_restore.length() > 0) {
-    Eeprom.saveRelayDefaultState(RELAY_FIRST, _relay_1_restore.toInt());
+  if (server.arg("relay_1_power_restored").length() > 0) {
+    Eeprom.saveRelayStateAfterPowerRestored(RELAY_FIRST, server.arg("relay_1_power_restored").toInt());
   }
 
-  if (_relay_2_restore.length() > 0) {
-    Eeprom.saveRelayDefaultState(RELAY_SECOND, _relay_2_restore.toInt());
+  if (server.arg("relay_2_power_restored").length() > 0) {
+    Eeprom.saveRelayStateAfterPowerRestored(RELAY_SECOND, server.arg("relay_2_power_restored").toInt());
   }
 
-  if (_relay_1_name.length() > 0) {
-    Eeprom.saveRelayName(RELAY_FIRST, _relay_1_name);
+  if (server.arg("relay_1_connection_restored").length() > 0) {
+    Eeprom.saveRelayStateAfterConnectionRestored(RELAY_FIRST, server.arg("relay_1_connection_restored").toInt());
   }
 
-  if (_relay_2_name.length() > 0) {
-    Eeprom.saveRelayName(RELAY_SECOND, _relay_2_name);
+  if (server.arg("relay_2_connection_restored").length() > 0) {
+    Eeprom.saveRelayStateAfterConnectionRestored(RELAY_SECOND, server.arg("relay_2_connection_restored").toInt());
+  }
+  if (server.arg("relay_1_name").length() > 0) {
+    Eeprom.saveRelayName(RELAY_FIRST, server.arg("relay_1_name"));
+  }
+
+  if (server.arg("relay_2_name").length() > 0) {
+    Eeprom.saveRelayName(RELAY_SECOND, server.arg("relay_2_name"));
   }  
 
-  if (_language.length() > 0) {
-    Eeprom.saveLanguage(_language);
+  if (server.arg("language").length() > 0) {
+    Eeprom.saveLanguage(server.arg("language"));
   }
 
   Configuration = Eeprom.getConfiguration();
@@ -431,7 +476,7 @@ void handleReset() {
     "<div class=\"section\">";page+=Configuration.language[0]==101?"Device reset":"Restart przełącznika";page+="</div>"
     "<div class=\"section-content\">"  
     "<h4 style=\"margin: 40px 0 10px 0;\"><span class=\"red\">";page+=Configuration.language[0]==101?"Important":"Ważne";page+=": </span> ";page+=Configuration.language[0]==101?"Sonoff will be to its default values. You will loose connecton with Sonoff":"Sonoff zostanie zresetowany do wartości początkowych. Utracisz z nim połączenie.";page+=".</h4>"
-    "<p>";page+=Configuration.language[0]==101?"Connect to WiFi":"Podłacz się do WiFi o nazwie ";page+=": <strong>";page+=Configuration.host_name;page+="</strong> ";page+=Configuration.language[0]==101?"from your computer or smartphone then open":"ze swojego komputera lub smartfonu, a następnie otwórz ";page+=" "
+    "<p>";page+=Configuration.language[0]==101?"Connect to WiFi":"Podłacz się do WiFi o nazwie ";page+=": <strong>";page+=Configuration.device_name;page+="</strong> ";page+=Configuration.language[0]==101?"from your computer or smartphone then open":"ze swojego komputera lub smartfonu, a następnie otwórz ";page+=" "
     "<a href=\"http://192.168.5.1\">http://192.168.5.1</a>"
     " ";page+=Configuration.language[0]==101?"and finish configuration":"i dokończ konfigurację";page+=".</p><br /><br /><br /><br />"
     "</div>";

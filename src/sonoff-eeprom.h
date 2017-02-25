@@ -28,26 +28,37 @@ class SonoffEEPROM
     SONOFFCONFIG getConfiguration();
    
     uint8_t getRelayState(byte id);
-    uint8_t getRelayStartState(byte id);
+ 
+    uint8_t getRelayStateAfterPowerRestored(byte id);
+    uint8_t getRelayStateAfterConnectionRestored(byte id);
+
     boolean isDS18B20Present();
     float   DS18B20Correction();
     unsigned int DS18B20ReadInterval();
+
+    void saveDeviceName(String in);
     void saveVersion(String in);
     void saveLanguage(String in);
+
+    void saveMode(int in); /* Look at MODE_... defined */
     void saveWiFiSSID(String in);
     void saveWiFiPassword(String in);
+    
     void saveMQTTHost(String in);
     void saveMQTTPort(unsigned int in);
     void saveMQTTUser(String in);
     void saveMQTTPassword(String in);
     void saveMQTTTopic(String in);
-    void saveMode(int in); /* Look at MODE_... defined */
+   
     void saveTemperatureCorrection(float in);
     void saveTemperatureInterval(unsigned int in);
     void saveTemperatureSensorPresent(unsigned int in);
+   
     void saveRelayState(byte id,unsigned int in);
-    void saveRelayDefaultState(byte id, unsigned int in);
+    void saveRelayStateAfterPowerRestored(byte id, unsigned int in);
+    void saveRelayStateAfterConnectionRestored(byte id, unsigned int in);
     void saveRelayName(byte id, String in);
+    
     void erase();
 };
 #endif

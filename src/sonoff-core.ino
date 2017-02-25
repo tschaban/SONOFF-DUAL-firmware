@@ -1,8 +1,8 @@
 /*
- SONOFF DUAL: firmware
- More info: https://github.com/tschaban/SONOFF-DUAL-firmware
- LICENCE: http://opensource.org/licenses/MIT
- 2017-02-12 tschaban https://github.com/tschaban
+  SONOFF DUAL: firmware
+  More info: https://github.com/tschaban/SONOFF-DUAL-firmware
+  LICENCE: http://opensource.org/licenses/MIT
+  2017-02-12 tschaban https://github.com/tschaban
 */
 
 #include "sonoff-core.h"
@@ -47,7 +47,7 @@ void Sonoff::toggle() {
 }
 
 void Sonoff::connectWiFi() {
-  WiFi.hostname(Configuration.host_name);
+  WiFi.hostname(Configuration.device_name);
   WiFi.begin(Configuration.wifi_ssid, Configuration.wifi_password);
   Serial << endl << "Connecting to WiFi: " << Configuration.wifi_ssid << endl;
   while (WiFi.status() != WL_CONNECTED) {
@@ -60,15 +60,15 @@ void Sonoff::connectWiFi() {
 
 void Sonoff::connectMQTT() {
   char  mqttString[50];
-  
+
   Mqtt.setServer(Configuration.mqtt_host, Configuration.mqtt_port);
   Mqtt.setCallback(callbackMQTT);
-  
-  sprintf(mqttString, "Sonoff (ID: %s)", Configuration.id);
+
+  sprintf(mqttString, "Sonoff (ID: %s)", Configuration.device_name);
   Serial << "Connecting to MQTT : " << Configuration.mqtt_host << ":" << Configuration.mqtt_port << endl;
   Serial << " - user : " << Configuration.mqtt_user << endl;
   Serial << " - password : " << Configuration.mqtt_password << endl;
- 
+
   while (!Mqtt.connected()) {
     if (Mqtt.connect(mqttString, Configuration.mqtt_user, Configuration.mqtt_password)) {
       Serial << endl << "Connected" << endl;
@@ -76,18 +76,36 @@ void Sonoff::connectMQTT() {
       Mqtt.subscribe(mqttString);
       Serial << " - Subsribed to : " << mqttString << endl;
 
-      /* Updating server with relay state or reading the value from the server */
-      if (Eeprom.getRelayStartState(RELAY_FIRST) == DEFAULT_RELAY_SERVER) {
+      /* Post connection relay #1 set up */
+      if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST) == DEFAULT_RELAY_ON && Relay.get(RELAY_FIRST) == RELAY_OFF) {
+        Relay.on(RELAY_FIRST);
+      } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST) == DEFAULT_RELAY_OFF && Relay.get(RELAY_FIRST) == RELAY_ON) {
+        Relay.off(RELAY_FIRST);
+      } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST) == DEFAULT_RELAY_LAST_KNOWN) {
+        if (Eeprom.getRelayState(RELAY_FIRST) == 0 && Relay.get(RELAY_FIRST) == RELAY_ON) {
+          Relay.on(RELAY_FIRST);
+        } else if (Eeprom.getRelayState(RELAY_FIRST) == 1 && Relay.get(RELAY_FIRST) == RELAY_OFF) {
+          Relay.off(RELAY_FIRST);
+        }
+      } else  {
         getRelayServerValue(RELAY_FIRST);
-      } else {
-        Relay.publish(RELAY_FIRST);
       }
 
-      if (Eeprom.getRelayStartState(RELAY_SECOND) == DEFAULT_RELAY_SERVER) {
+      /* Post connection relay #2 set up */
+      if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND) == DEFAULT_RELAY_ON && Relay.get(RELAY_SECOND) == RELAY_OFF) {
+        Relay.on(RELAY_SECOND);
+      } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND) == DEFAULT_RELAY_OFF && Relay.get(RELAY_SECOND) == RELAY_ON) {
+        Relay.off(RELAY_SECOND);
+      } else if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND) == DEFAULT_RELAY_LAST_KNOWN) {
+        if (Eeprom.getRelayState(RELAY_SECOND) == 0 && Relay.get(RELAY_SECOND) == RELAY_ON) {
+          Relay.on(RELAY_SECOND);
+        } else if (Eeprom.getRelayState(RELAY_SECOND) == 1 && Relay.get(RELAY_SECOND) == RELAY_OFF) {
+          Relay.off(RELAY_SECOND);
+        }
+      } else  {
         getRelayServerValue(RELAY_SECOND);
-      } else {
-        Relay.publish(RELAY_SECOND);
       }
+
 
       Led.off();
     } else {
@@ -133,7 +151,7 @@ void Sonoff::publishTemperature(float temperature) {
 
 void Sonoff::getRelayServerValue(byte id) {
   char  mqttString[50];
-  sprintf(mqttString, "%s%s/get", Configuration.mqtt_topic,(id==RELAY_FIRST?Configuration.relay_1_name:Configuration.relay_2_name));
+  sprintf(mqttString, "%s%s/get", Configuration.mqtt_topic, (id == RELAY_FIRST ? Configuration.relay_1_name : Configuration.relay_2_name));
   Serial << endl << " Requesting default relay value";
   Mqtt.publish(mqttString, "defaultState");
   Serial << ", completed" << endl;
@@ -172,12 +190,12 @@ void Sonoff::runConfigurationAP() {
   IPAddress apIP(192, 168, 5, 1);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-  WiFi.softAP(Configuration.host_name);
+  WiFi.softAP(Configuration.device_name);
   dnsServer.setTTL(300);
   dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
   dnsServer.start(53, "www.example.com", apIP);
   startHttpServer();
-  Serial << " - After conecting to WiFi: " << Configuration.host_name << " open: http://192.168.5.1/  " << endl << endl;
+  Serial << " - After conecting to WiFi: " << Configuration.device_name << " open: http://192.168.5.1/  " << endl << endl;
   Led.startBlinking(0.1);
 }
 
@@ -192,7 +210,7 @@ boolean Sonoff::isConfigured() {
 void Sonoff::postUpgradeCheck() {
   if (String(sonoffDefault.version) != String(Configuration.version)) {
     Serial << endl << "SOFTWARE WAS UPGRADED from version : " << Configuration.version << " to " << sonoffDefault.version << endl;
-    Eeprom.saveVersion(sonoffDefault.version);    
+    Eeprom.saveVersion(sonoffDefault.version);
     Configuration = Eeprom.getConfiguration();
   }
 }
@@ -208,27 +226,57 @@ void callbackDS18B20() {
 void callbackMQTT(char* topic, byte* payload, unsigned int length) {
   char  mqttString[50];
   Led.blink();
-  Serial << "Got MQTT Topic : " << topic << ", length=" << length;
-  String sTopic = String(topic);
-  
-  if (length >= 1) { // command arrived
-    if ((char)payload[1] == 'N') { // ON
-      Serial << " ON" << endl;
-      Relay.on(RELAY_FIRST);
-    } else if ((char)payload[1] == 'F') { // OFF
-      Serial << " OFF" << endl;
-      Relay.off(RELAY_FIRST);
-    } else if ((char)payload[2] == 'p') { // reportState
-      Serial << " reportState" << endl;
-      Relay.publish(RELAY_FIRST);
-    } else if ((char)payload[2] == 's') { // reset
-      Serial << " reset" << endl;
-      ESP.restart();
-    } else if ((char)payload[2] == 'n') { // configurationMode
-      Serial << " configuration Mode" << endl;
-      Sonoff.toggle();
+
+  String _topic = String(topic);
+
+  sprintf(mqttString, "%s%s/cmd", Configuration.mqtt_topic, Configuration.relay_1_name);
+  String _sonoff_relay_1 = String(mqttString);
+
+  sprintf(mqttString, "%s%s/cmd", Configuration.mqtt_topic, Configuration.relay_2_name);
+  String _sonoff_relay_2 = String(mqttString);
+
+  sprintf(mqttString, "%scmd", Configuration.mqtt_topic);
+  String _sonoff = String(mqttString);
+
+  Serial << "Received MQTT Message : Topic: " << topic << ", Length: " << length << ", Message: ";
+
+  for (int i = 0; i < length; i++) {
+    Serial << (char)payload[i];
+  }
+
+
+  if (_topic == _sonoff_relay_1) {
+    if (length == 2 && (char)payload[0] == 'O' && (char)payload[1] == 'N') { // ON
+        Relay.on(RELAY_FIRST);
+    } else if (length == 3 && (char)payload[0] == 'O' && (char)payload[2] == 'F') { // OFF
+        Relay.off(RELAY_FIRST);
+    } else if (length == 11 && (char)payload[0] == 'R' && (char)payload[10] == 'e') { // ReportState
+        Relay.publish(RELAY_FIRST);
     }
   }
+
+  if (_topic == _sonoff_relay_2) {
+    if (length == 2 && (char)payload[0] == 'O' && (char)payload[1] == 'N') { // ON
+        Relay.on(RELAY_SECOND);
+    } else if (length == 3 && (char)payload[0] == 'O' && (char)payload[2] == 'F') { // OFF
+        Relay.off(RELAY_SECOND);
+    } else if (length == 11 && (char)payload[0] == 'R' && (char)payload[10] == 'e') { // ReportState
+        Relay.publish(RELAY_SECOND);
+    }
+  }
+
+  if (_topic == _sonoff) {
+    if (length == 6 && (char)payload[0] == 'R' && (char)payload[5] == 't') { // Reboot
+      ESP.restart();
+    } else if (length == 17 && (char)payload[0] == 'C' && (char)payload[16] == 'e') { // ConfigurationMode
+      Eeprom.saveMode(MODE_CONFIGURATION);
+      ESP.restart();
+    } else if (length == 15 && (char)payload[0] == 'A' && (char)payload[14] == 'e') { // Access Point Mode
+      Eeprom.saveMode(MODE_ACCESSPOINT);
+      ESP.restart();
+    }
+  }
+
   Serial << endl;
 }
 

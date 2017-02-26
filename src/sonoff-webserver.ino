@@ -7,7 +7,7 @@
 
 
 void startHttpServer() {
-  Serial << endl << " - Starting web server" << endl;
+  if (debug) Serial << endl << " - Starting web server" << endl;
   server.on("/", handleRoot);
   server.on("/configure", handleConfiguration);
   server.on("/reboot", handleReboot);
@@ -17,12 +17,12 @@ void startHttpServer() {
   server.onNotFound(handleNotFound);
   httpUpdater.setup(&server);
   server.begin();
-  Serial << " - Web server is working" << endl;
+  if (debug) Serial << " - Web server is working" << endl;
 }
 
 void handleRoot() {
-  Serial << "Server: root requested" << endl;
-  Serial << Configuration.language[0];
+  if (debug) Serial << "Server: root requested" << endl;
+  if (debug) Serial << Configuration.language[0];
   String page = 
     "<div class=\"section\">";page+=Configuration.language[0]==101?"Device information":"Informacje o urządzeniu";page+="</div>"
     "<div class=\"section-content\">"
@@ -93,8 +93,8 @@ void handleRoot() {
     "<td>: ";page+=Configuration.relay_1_name;page+="</td>"
     "</tr>"        
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+=":</td>"
-    "<td>"; 
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+="</td>"
+    "<td>: "; 
 
     if (Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
@@ -107,8 +107,8 @@ void handleRoot() {
     page += "</td>"
     "</tr>"
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+=":</td>"
-    "<td>"; 
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+="</td>"
+    "<td>: "; 
 
     if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_FIRST)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
@@ -132,8 +132,8 @@ void handleRoot() {
     "<td>: ";page+=Configuration.relay_2_name;page+="</td>"
     "</tr>"        
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+=":</td>"
-    "<td>"; 
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After power is restored relay is to":"Po przywróceniu zasilania przełącznik jest ustawiony na";page+="</td>"
+    "<td>: "; 
 
     if (Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
@@ -146,8 +146,8 @@ void handleRoot() {
     page += "</td>"
     "</tr>"
     "<tr>"
-    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+=":</td>"
-    "<td>"; 
+    "<td class=\"label\">";page+=Configuration.language[0]==101?"After connection to MQTT Server is restored relay is set to":"Po przywróceniu połączenia do serwera MQTT przełącznik jest ustawiony na";page+="</td>"
+    "<td>: "; 
 
     if (Eeprom.getRelayStateAfterConnectionRestored(RELAY_SECOND)==DEFAULT_RELAY_ON) {
         page += Configuration.language[0]==101?"ON":"Właczony";
@@ -162,16 +162,31 @@ void handleRoot() {
     page += "</td>"
     "</tr>" 
     "</table>"
-    "</div>";
+    "</div>"
+     "<div class=\"section\">Debugger</div>"
+    "<div class=\"section-content\">"
+    "<table>"
+    "<tr>"
+    "<td class=\"label\">Debugger</td>"
+    "<td>: "; 
 
-    
+    if (Eeprom.isDebuggable()) {
+        page += Configuration.language[0]==101?"ON":"Właczony";
+    } else {
+       page += Configuration.language[0]==101?"OFF":"Wyłączony";
+    } 
+
+    page += "</td>"
+    "</tr>" 
+    "</table>"
+    "</div>";
 
   generatePage(page,true,0);
 }
 
 void handleConfiguration() {
 
-  Serial << "Server: configuration" << endl;
+  if (debug) Serial << "Server: configuration" << endl;
   
   String page =
     "<form action=\"/save\"  method=\"post\">"
@@ -306,6 +321,22 @@ void handleConfiguration() {
     "</tr>"
     "</table>"
     "</div>"   
+
+
+    "<div class=\"section\">Debugger</div>"
+    "<div class=\"section-content\">"
+    "<table>"
+    "<tr>"
+    "<td class=\"label\">Debugger<sup class=\"red\">*</sup></td>"
+    "<td>: <select name=\"debug\" length=1>"
+    "<option value=\"0\""; page+= !Eeprom.isDebuggable() ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"On":"Wyłączony";page+="</option>"
+    "<option value=\"1\""; page+= Eeprom.isDebuggable() ?" selected=\"selected\"":"";page+=">";page+=Configuration.language[0]==101?"Off":"Właczony";page+="</option>"
+    "</select></td>"
+    "</tr>"
+    "</table>"
+    "</div>" 
+
+    
     "<div class=\"section\"></div>"
     "<div class=\"section-content\">";
   page += "<input class=\"submit\" type=\"submit\" value=\"";page+=Configuration.language[0]==101?"Save":"Zapisz";page+="\" />"
@@ -319,7 +350,7 @@ void handleSave() {
   Led.stopBlinking();
   Led.on();
 
-  Serial << "Server: saving data" << endl;
+  if (debug) Serial << "Server: saving data" << endl;
 
   if (server.arg("device_name").length() > 0) {
     Eeprom.saveDeviceName(server.arg("device_name"));
@@ -392,6 +423,10 @@ void handleSave() {
     Eeprom.saveRelayName(RELAY_SECOND, server.arg("relay_2_name"));
   }  
 
+  if (server.arg("debug").length() > 0) {
+    Eeprom.saveDebugMode(server.arg("debug").toInt()==1?true:false);
+  } 
+
   if (server.arg("language").length() > 0) {
     Eeprom.saveLanguage(server.arg("language"));
   }
@@ -412,7 +447,7 @@ void handleSave() {
 }
 
 void handleUpgrade() {
-    Serial << "Server: upgrade" << endl;
+    if (debug) Serial << "Server: upgrade" << endl;
     String page =
       "<div class=\"section\">";page+=Configuration.language[0]==101?"Firmware upgrade":"Aktualizacja oprogramowania";page+="</div>"
       "<div class=\"section-content\">"
@@ -446,23 +481,24 @@ void handleUpgradeCompleted(boolean status) {
 }
 
 void handleNotFound() {
-  Serial << "Server: page not found" << endl;
+  if (debug) Serial << "Server: page not found" << endl;
 
   String page = 
     "<div class=\"section-content\">"  
     "<h4 style=\"margin: 60px 0px;\"><span class=\"red\">";page+=Configuration.language[0]==101?"Error":"Błąd";page+=" 404:</span> ";page+=Configuration.language[0]==101?"Page Not Found":"Strona nie została odnaleziona";page+=".</h4>"
     "</div>";
 
-  Serial << server.uri() << " " << server.args() << endl;
-  
+  if (debug) Serial << server.uri() << " " << server.args() << endl;
+  if (debug) 
   for (uint8_t i = 0; i < server.args(); i++) {
    Serial <<  server.argName(i) << ": " << server.arg(i) << endl;
   }
+
   generatePage(page,true,0);
 }
 
 void handleReboot() {
-  Serial << "Server: rebooting device" << endl;
+  if (debug)  Serial << "Server: rebooting device" << endl;
   String page =
     "<div class=\"section-content\">"  
     "<h4 style=\"margin: 60px 0px;\">";page+=Configuration.language[0]==101?"Rebooting is in progress":"Trwa restart";page+="</h4>"
@@ -480,8 +516,8 @@ void handleReset() {
     "<a href=\"http://192.168.5.1\">http://192.168.5.1</a>"
     " ";page+=Configuration.language[0]==101?"and finish configuration":"i dokończ konfigurację";page+=".</p><br /><br /><br /><br />"
     "</div>";
-  generatePage(page,false,10);
-  Sonoff.reset();
+  (page,false,10);
+  generatePage(page,true,0);
 }
 
 void handleFavicon() {
@@ -537,14 +573,15 @@ void generatePage(String &page, boolean navigation, uint8_t redirect) {
   _page+=": " + String(Configuration.version) + "</p>"
   "<ul>";
   _page+=Configuration.language[0]==101 ? 
-      "<li><a href=\"http://smart-house.adrian.czabanowski.com/en-sonoff-firmware/\" target=\"_blank\">Documentation</a></li>" :
-      "<li><a href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/\" target=\"_blank\">Dokumentacja</a></li>";
+      "<li><a href=\"http://smart-house.adrian.czabanowski.com/en-sonoff-dual-firmware/\" target=\"_blank\">Documentation</a></li>" :
+      "<li><a href=\"http://smart-house.adrian.czabanowski.com/firmware-dual-sonoff/\" target=\"_blank\">Dokumentacja</a></li>";
 
   _page+="<li><a href=\"http://smart-house.adrian.czabanowski.com/forum/firmware-do-przelacznika-sonoff/\" target=\"_blank\">"; 
   _page+=Configuration.language[0]==101?"Support":"Wsparcie";_page+="</a></li>";
-  
       
   _page+="<li><a href=\"https://github.com/tschaban/SONOFF-DUAL-firmware\" target=\"_blank\">GitHub</a></li>"
+    "<li><a href=\"https://github.com/tschaban/SONOFF-BASIC-firmware/blob/master/LICENSE\" target=\"_blank\">";   
+  _page+=Configuration.language[0]==101?"MIT License":"Licencja użytkowania";page+="</a></li>"
 
   "</ul>"
   "</div>"

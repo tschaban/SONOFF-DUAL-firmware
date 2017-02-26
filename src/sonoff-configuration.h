@@ -9,7 +9,6 @@
 #ifndef _sonoff_configuration_h
 #define _sonoff_configuration_h
 
-#define BUTTON 0
 #define GPIO_LED 13
 
 /* Configuration parameters */
@@ -32,7 +31,7 @@
 #define   RELAY_ON 1
 
 struct DEFAULTS {
-  char          version[6] = "0.1.1";
+  char          version[6] = "0.2.0";
   char          language[3] = "en";
   unsigned int  mqtt_port = 1883;
   float         temp_correction = 0;

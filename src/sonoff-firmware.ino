@@ -19,7 +19,6 @@
 #include "sonoff-led.h"
 #include "sonoff-eeprom.h"
 #include "sonoff-relay.h"
-#include "sonoff-button.h"
 #include "sonoff-ota.h"
 
 DEFAULTS sonoffDefault;
@@ -36,42 +35,41 @@ DallasTemperature DS18B20(&wireProtocol);
 
 SonoffEEPROM    Eeprom;
 SonoffRelay     Relay;
-SonoffButton    Button;
 SonoffLED       Led;
 Sonoff          Sonoff;
 
-void setup() {
-  Serial.begin(19200);
-  delay(10);
+boolean debug;
 
+void setup() {
   Serial.println();
+
+  debug = Eeprom.isDebuggable();
 
   Configuration = Eeprom.getConfiguration();
 
- 
-  Serial << endl << "Configuration: " << endl;
-  Serial << " - Version: " << Configuration.version << endl;
-  Serial << " - Language: " << Configuration.language << endl;
-  Serial << " - Switch mode: " << Configuration.mode << endl;
-  Serial << " - Host name: " << Configuration.device_name << endl;
-  Serial << " - WiFi SSID: " << Configuration.wifi_ssid << endl;
-  Serial << " - WiFi Password: " << Configuration.wifi_password << endl;
-  Serial << " - MQTT Host: " << Configuration.mqtt_host << endl;
-  Serial << " - MQTT Port: " << Configuration.mqtt_port << endl;
-  Serial << " - MQTT User: " << Configuration.mqtt_user << endl;
-  Serial << " - MQTT Password: " << Configuration.mqtt_password << endl;
-  Serial << " - MQTT Topic: " << Configuration.mqtt_topic <<  endl;  
-  Serial << " - Relay 1 name: " << Configuration.relay_1_name << endl;
-  Serial << " - Relay 2 name: " << Configuration.relay_2_name << endl;
-  Serial << " - Relay 1 state: " << Eeprom.getRelayState(RELAY_FIRST) << endl;
-  Serial << " - Relay 2 state: " << Eeprom.getRelayState(RELAY_SECOND) << endl;
-  Serial << " - Post crash relay 1 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST) << endl;
-  Serial << " - Post crash relay 2 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND) << endl;
-  Serial << " - DS18B20 present: " << Configuration.ds18b20_present << endl;
-  Serial << " - Temp correctin: " << Configuration.ds18b20_correction << endl;
-  Serial << " - Temp interval: " << Configuration.ds18b20_interval << endl;
+  if (debug) Serial << endl << "Configuration: " << endl;
+  if (debug) Serial << " - Version: " << Configuration.version << endl;
+  if (debug) Serial << " - Language: " << Configuration.language << endl;
+  if (debug) Serial << " - Switch mode: " << Configuration.mode << endl;
+  if (debug) Serial << " - Host name: " << Configuration.device_name << endl;
+  if (debug) Serial << " - WiFi SSID: " << Configuration.wifi_ssid << endl;
+  if (debug) Serial << " - WiFi Password: " << Configuration.wifi_password << endl;
+  if (debug) Serial << " - MQTT Host: " << Configuration.mqtt_host << endl;
+  if (debug) Serial << " - MQTT Port: " << Configuration.mqtt_port << endl;
+  if (debug) Serial << " - MQTT User: " << Configuration.mqtt_user << endl;
+  if (debug) Serial << " - MQTT Password: " << Configuration.mqtt_password << endl;
+  if (debug) Serial << " - MQTT Topic: " << Configuration.mqtt_topic <<  endl;  
+  if (debug) Serial << " - Relay 1 name: " << Configuration.relay_1_name << endl;
+  if (debug) Serial << " - Relay 2 name: " << Configuration.relay_2_name << endl;
+  if (debug) Serial << " - Relay 1 state: " << Eeprom.getRelayState(RELAY_FIRST) << endl;
+  if (debug) Serial << " - Relay 2 state: " << Eeprom.getRelayState(RELAY_SECOND) << endl;
+  if (debug) Serial << " - Post crash relay 1 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_FIRST) << endl;
+  if (debug) Serial << " - Post crash relay 2 state: " << Eeprom.getRelayStateAfterPowerRestored(RELAY_SECOND) << endl;
+  if (debug) Serial << " - DS18B20 present: " << Configuration.ds18b20_present << endl;
+  if (debug) Serial << " - Temp correctin: " << Configuration.ds18b20_correction << endl;
+  if (debug) Serial << " - Temp interval: " << Configuration.ds18b20_interval << endl;
 
-   
+  
   Sonoff.run(); 
   
 }

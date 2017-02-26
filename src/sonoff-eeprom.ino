@@ -1,8 +1,8 @@
 /*
- SONOFF DUAL: firmware
- More info: https://github.com/tschaban/SONOFF-DUAL-firmware
- LICENCE: http://opensource.org/licenses/MIT
- 2017-02-12 tschaban https://github.com/tschaban
+  SONOFF DUAL: firmware
+  More info: https://github.com/tschaban/SONOFF-DUAL-firmware
+  LICENCE: http://opensource.org/licenses/MIT
+  2017-02-12 tschaban https://github.com/tschaban
 */
 
 #include "sonoff-eeprom.h"
@@ -11,7 +11,7 @@ SonoffEEPROM::SonoffEEPROM() {
   EEPROM.begin(EEPROM_size);
 
   /* If version not set it assumes first launch */
-  if (read(0,8)[0] == '\0')  {
+  if (read(0, 8)[0] == '\0')  {
     erase();
     saveMode(1);
   }
@@ -21,11 +21,11 @@ SonoffEEPROM::SonoffEEPROM() {
 SONOFFCONFIG SonoffEEPROM::getConfiguration() {
   SONOFFCONFIG _temp;
 
-  read(0,5).toCharArray(_temp.version,sizeof(_temp.version));  
+  read(0, 5).toCharArray(_temp.version, sizeof(_temp.version));
   _temp.mode = read(21, 1).toInt();
-  
-  // If there is no version in EPPROM this a first launch 
-  if(_temp.version[0] == '\0')  {
+
+  // If there is no version in EPPROM this a first launch
+  if (_temp.version[0] == '\0')  {
     erase();
     _temp.mode = MODE_ACCESSPOINT;
   }
@@ -36,14 +36,14 @@ SONOFFCONFIG SonoffEEPROM::getConfiguration() {
 
   /* Reading WiFi Parameters */
   read(24, 32).toCharArray(_temp.wifi_ssid, sizeof(_temp.wifi_ssid));
-  read(56, 32).toCharArray(_temp.wifi_password, sizeof(_temp.wifi_password));  
+  read(56, 32).toCharArray(_temp.wifi_password, sizeof(_temp.wifi_password));
 
   /* Reading MQTT Parameters */
   read(88, 32).toCharArray(_temp.mqtt_host, sizeof(_temp.mqtt_host));
-  _temp.mqtt_port = read(120, 5).toInt();      
+  _temp.mqtt_port = read(120, 5).toInt();
   read(125, 16).toCharArray(_temp.mqtt_user, sizeof(_temp.mqtt_user));
   read(141, 16).toCharArray(_temp.mqtt_password, sizeof(_temp.mqtt_password));
-  read(157, 32).toCharArray(_temp.mqtt_topic, sizeof(_temp.mqtt_topic));  
+  read(157, 32).toCharArray(_temp.mqtt_topic, sizeof(_temp.mqtt_topic));
 
   /* Reading Relay Parameters */
   read(189, 16).toCharArray(_temp.relay_1_name, sizeof(_temp.relay_1_name));
@@ -55,6 +55,10 @@ SONOFFCONFIG SonoffEEPROM::getConfiguration() {
   _temp.ds18b20_interval = DS18B20ReadInterval();
 
   return _temp;
+}
+
+boolean SonoffEEPROM::isDebuggable() {
+  return (read(239, 1).toInt() == 1 ? true : false);
 }
 
 boolean SonoffEEPROM::isDS18B20Present() {
@@ -71,22 +75,22 @@ unsigned int SonoffEEPROM::DS18B20ReadInterval() {
 
 
 uint8_t SonoffEEPROM::getRelayState(byte id) {
-  if (id==RELAY_FIRST) 
+  if (id == RELAY_FIRST)
     return read(221, 1).toInt();
   else
     return read(222, 1).toInt();
-    
+
 }
 
 uint8_t SonoffEEPROM::getRelayStateAfterPowerRestored(byte id) {
-  if (id==RELAY_FIRST) 
+  if (id == RELAY_FIRST)
     return read(223, 1).toInt();
   else
     return read(224, 1).toInt();
 }
 
 uint8_t SonoffEEPROM::getRelayStateAfterConnectionRestored(byte id) {
-  if (id==RELAY_FIRST) 
+  if (id == RELAY_FIRST)
     return read(225, 1).toInt();
   else
     return read(226, 1).toInt();
@@ -101,12 +105,11 @@ void SonoffEEPROM::saveDeviceName(String in) {
 }
 
 void SonoffEEPROM::saveLanguage(String in) {
-  write(22,2,in);
+  write(22, 2, in);
 }
-  
+
 void SonoffEEPROM::saveMode(int in) {
   write(21, 1, String(in));
-    Serial << " - Switch mode: " << String(in)<< endl;
 }
 
 void SonoffEEPROM::saveTemperatureCorrection(float in) {
@@ -122,31 +125,31 @@ void SonoffEEPROM::saveTemperatureSensorPresent(unsigned int in) {
 }
 
 void SonoffEEPROM::saveRelayState(byte id, unsigned int in) {
-  if (id==RELAY_FIRST) 
-     write(221, 1, String(in));
-  else 
-     write(222, 1, String(in));   
+  if (id == RELAY_FIRST)
+    write(221, 1, String(in));
+  else
+    write(222, 1, String(in));
 }
 
 void SonoffEEPROM::saveRelayStateAfterPowerRestored(byte id, unsigned int in) {
-  if (id==RELAY_FIRST) 
-     write(223, 1, String(in));
-  else 
-     write(224, 1, String(in)); 
+  if (id == RELAY_FIRST)
+    write(223, 1, String(in));
+  else
+    write(224, 1, String(in));
 }
 
 void SonoffEEPROM::saveRelayStateAfterConnectionRestored(byte id, unsigned int in) {
-  if (id==RELAY_FIRST) 
-     write(225, 1, String(in));
-  else 
-     write(226, 1, String(in)); 
+  if (id == RELAY_FIRST)
+    write(225, 1, String(in));
+  else
+    write(226, 1, String(in));
 }
 
 void SonoffEEPROM::saveRelayName(byte id, String in) {
-  if (id==RELAY_FIRST) 
-     write(189, 16, in);
-  else 
-     write(205, 16, in); 
+  if (id == RELAY_FIRST)
+    write(189, 16, in);
+  else
+    write(205, 16, in);
 }
 
 void SonoffEEPROM::saveWiFiSSID(String in) {
@@ -177,13 +180,21 @@ void SonoffEEPROM::saveMQTTTopic(String in) {
   write(157, 32, in);
 }
 
+void SonoffEEPROM::saveDebugMode(boolean in) {
+  if (in) {
+    write(239, 1, String(1));
+  } else {
+    write(239, 1, String(0));
+  }
+}
+
 void SonoffEEPROM::erase() {
   clear(0, EEPROM_size);
   setDefaults();
 }
 
 void SonoffEEPROM::setDefaults() {
-  
+
   char _id[6] = {0};
   char _device_name[16] = {0};
   char _mqtt_topic[32] = {0};
@@ -205,18 +216,20 @@ void SonoffEEPROM::setDefaults() {
 
   saveMode(MODE_SWITCH);
 
-  saveRelayName(RELAY_FIRST,sonoffDefault.relay_1_name);
-  saveRelayName(RELAY_SECOND,sonoffDefault.relay_2_name);
-  
-  saveRelayState(RELAY_FIRST,0);
-  saveRelayState(RELAY_SECOND,0);
-  
-  saveRelayStateAfterPowerRestored(RELAY_FIRST,sonoffDefault.relay_state_after_power_restored);
-  saveRelayStateAfterConnectionRestored(RELAY_FIRST,sonoffDefault.relay_state_after_connection_restored);  
-  saveRelayStateAfterPowerRestored(RELAY_SECOND,sonoffDefault.relay_state_after_power_restored);
-  saveRelayStateAfterConnectionRestored(RELAY_SECOND,sonoffDefault.relay_state_after_connection_restored); 
-  
-  saveLanguage(sonoffDefault.language); 
+  saveRelayName(RELAY_FIRST, sonoffDefault.relay_1_name);
+  saveRelayName(RELAY_SECOND, sonoffDefault.relay_2_name);
+
+  saveRelayState(RELAY_FIRST, 0);
+  saveRelayState(RELAY_SECOND, 0);
+
+  saveRelayStateAfterPowerRestored(RELAY_FIRST, sonoffDefault.relay_state_after_power_restored);
+  saveRelayStateAfterConnectionRestored(RELAY_FIRST, sonoffDefault.relay_state_after_connection_restored);
+  saveRelayStateAfterPowerRestored(RELAY_SECOND, sonoffDefault.relay_state_after_power_restored);
+  saveRelayStateAfterConnectionRestored(RELAY_SECOND, sonoffDefault.relay_state_after_connection_restored);
+
+  saveDebugMode(false);
+
+  saveLanguage(sonoffDefault.language);
 }
 
 

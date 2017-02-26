@@ -26,6 +26,8 @@ class SonoffEEPROM
     SonoffEEPROM();
 
     SONOFFCONFIG getConfiguration();
+
+    boolean isDebuggable();
    
     uint8_t getRelayState(byte id);
  
@@ -58,6 +60,8 @@ class SonoffEEPROM
     void saveRelayStateAfterPowerRestored(byte id, unsigned int in);
     void saveRelayStateAfterConnectionRestored(byte id, unsigned int in);
     void saveRelayName(byte id, String in);
+
+    void saveDebugMode(boolean in);
     
     void erase();
 };

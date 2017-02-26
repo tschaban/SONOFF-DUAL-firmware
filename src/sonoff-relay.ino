@@ -8,6 +8,8 @@
 #include "sonoff-relay.h"
 
 SonoffRelay::SonoffRelay() {
+  Serial.begin(19200);
+  delay(10);
   init(RELAY_FIRST);
   init(RELAY_SECOND);
 }
@@ -27,11 +29,11 @@ void SonoffRelay::init(byte id) {
 }
 
 uint8_t SonoffRelay::get(byte relayID) {
-  if (relayID==RELAY_FIRST) {
-    return Relay_1?RELAY_ON:RELAY_OFF;
+  if (relayID == RELAY_FIRST) {
+    return Relay_1 ? RELAY_ON : RELAY_OFF;
   } else {
-    return Relay_2?RELAY_ON:RELAY_OFF;
-  }  
+    return Relay_2 ? RELAY_ON : RELAY_OFF;
+  }
 }
 
 /* Set relay to ON */
@@ -48,7 +50,7 @@ void SonoffRelay::on(byte relayID) {
   setRelay();
   publish(relayID);
 
-  Serial << "Relay: " << relayID << " set to ON" << endl;
+  if (debug) Serial << "Relay: " << relayID << " set to ON" << endl;
   Led.blink();
 }
 
@@ -66,7 +68,7 @@ void SonoffRelay::off(byte relayID) {
   setRelay();
   publish(relayID);
 
-  Serial << "Relay: " << relayID << " set to OFF" << endl;
+  if (debug) Serial << "Relay: " << relayID << " set to OFF" << endl;
   Led.blink();
 }
 
@@ -83,7 +85,7 @@ void SonoffRelay::toggle(byte relayID) {
   setRelay();
   publish(relayID);
 
-  Serial << "Relay: " << relayID << " toggled" << endl;
+  if (debug) Serial << "Relay: " << relayID << " toggled" << endl;
   Led.blink();
 }
 
@@ -99,11 +101,11 @@ void SonoffRelay::publish(byte relayID) {
 }
 
 void SonoffRelay::publishState(byte id) {
-    char  mqttString[50];
-    sprintf(mqttString, "%s%s/state", Configuration.mqtt_topic,id==RELAY_FIRST?Configuration.relay_1_name:Configuration.relay_2_name);
-    Eeprom.saveRelayState(id,id==RELAY_FIRST?Relay_1?1:0:Relay_2?1:0);
-    Mqtt.publish(mqttString, id==RELAY_FIRST?Relay_1?"ON":"OFF":Relay_2?"ON":"OFF");
-    Serial << endl << "Publish: " << mqttString << endl;
+  char  mqttString[50];
+  sprintf(mqttString, "%s%s/state", Configuration.mqtt_topic, id == RELAY_FIRST ? Configuration.relay_1_name : Configuration.relay_2_name);
+  Eeprom.saveRelayState(id, id == RELAY_FIRST ? Relay_1 ? 1 : 0 : Relay_2 ? 1 : 0);
+  Mqtt.publish(mqttString, id == RELAY_FIRST ? Relay_1 ? "ON" : "OFF" : Relay_2 ? "ON" : "OFF");
+  if (debug) Serial << endl << "Publish: " << mqttString << endl;
 }
 
 void SonoffRelay::setRelay () {
